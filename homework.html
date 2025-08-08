@@ -233,7 +233,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, collection, addDoc, updateDoc, deleteDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, collection, addDoc, updateDoc, deleteDoc, getDocs, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- CONFIGURATION ---
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
@@ -483,10 +483,16 @@
             const editingId = editingIdInput.value;
             const formData = new FormData(homeworkForm);
             
+            const jsDate = toDateTime(formData.get('dueDate'), formData.get('dueTime'));
+            if (!jsDate) {
+                showStatus('รูปแบบวันที่หรือเวลาไม่ถูกต้อง', '⚠️');
+                return;
+            }
+
             const data = {
                 subject: formData.get('subject'),
                 details: formData.get('details'),
-                dueDate: toDateTime(formData.get('dueDate'), formData.get('dueTime')),
+                dueDate: Timestamp.fromDate(jsDate),
                 dueTime: formData.get('dueTime'),
                 submissionMethod: formData.get('submissionMethod'),
                 link: formData.get('link'),
