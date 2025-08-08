@@ -162,7 +162,7 @@
     <div id="announcement-modal" class="modal fixed inset-0 items-center justify-center bg-black bg-opacity-50 z-50 p-4">
         <div class="relative rounded-lg shadow-xl max-w-full">
             <button id="close-announcement-modal" class="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full w-8 h-8 flex items-center justify-center text-xl font-bold">&times;</button>
-            <img id="announcement-modal-image" src="" alt="Announcement" class="rounded-lg max-w-full h-auto">
+            <img id="announcement-modal-image" src="" alt="Announcement" class="rounded-lg max-w-full h-auto" onerror="this.onerror=null; this.src='https://placehold.co/600x400/fecaca/dc2626?text=Image+Not+Found';">
         </div>
     </div>
 
@@ -285,7 +285,7 @@
         const printCard = (homework) => {
             const printContent = `
                 <div style="width: 60mm; height: 83mm; padding: 10px; border: 1px solid black; font-family: 'Sarabun', sans-serif;">
-                    <h1 style="font-size: 1.5rem; margin-bottom: 10px; font-weight: bold;">📚 บัตรติดงานการบ้าน</h1>
+                    <h1 style="font-size: 1.5rem; margin-bottom: 10px; font-weight: bold;">� บัตรติดงานการบ้าน</h1>
                     <p style="margin-bottom: 5px;"><strong>🔤 วิชา:</strong> ${homework.subject}</p>
                     <p style="margin-bottom: 5px;"><strong>📅 กำหนดส่ง:</strong> ${new Date(homework.dueDate.seconds * 1000).toLocaleDateString('th-TH')} ${homework.dueTime}</p>
                     <p style="margin-bottom: 5px;"><strong>📝 รายละเอียดงาน:</strong> ${homework.details}</p>
@@ -460,7 +460,13 @@
             });
 
             if (activeAnnouncement) {
-                document.getElementById('announcement-modal-image').src = activeAnnouncement.imageUrl;
+                const img = document.getElementById('announcement-modal-image');
+                img.src = activeAnnouncement.imageUrl;
+                // Reset onerror to handle new image errors
+                img.onerror = function() {
+                    this.onerror=null; 
+                    this.src='https://placehold.co/600x400/fecaca/dc2626?text=Image+Not+Found';
+                };
                 announcementModal.classList.add('is-visible');
             } else {
                 announcementModal.classList.remove('is-visible');
@@ -714,3 +720,4 @@
     </script>
 </body>
 </html>
+�
