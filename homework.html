@@ -285,7 +285,7 @@
         const printCard = (homework) => {
             const printContent = `
                 <div style="width: 60mm; height: 83mm; padding: 10px; border: 1px solid black; font-family: 'Sarabun', sans-serif;">
-                    <h1 style="font-size: 1.5rem; margin-bottom: 10px; font-weight: bold;">� บัตรติดงานการบ้าน</h1>
+                    <h1 style="font-size: 1.5rem; margin-bottom: 10px; font-weight: bold;">📚 บัตรติดงานการบ้าน</h1>
                     <p style="margin-bottom: 5px;"><strong>🔤 วิชา:</strong> ${homework.subject}</p>
                     <p style="margin-bottom: 5px;"><strong>📅 กำหนดส่ง:</strong> ${new Date(homework.dueDate.seconds * 1000).toLocaleDateString('th-TH')} ${homework.dueTime}</p>
                     <p style="margin-bottom: 5px;"><strong>📝 รายละเอียดงาน:</strong> ${homework.details}</p>
@@ -337,7 +337,10 @@
             submittedList.innerHTML = '';
 
             const now = new Date();
-            const sortedHomeworks = [...homeworks].sort((a, b) => a.dueDate.seconds - b.dueDate.seconds);
+            const sortedHomeworks = [...homeworks].sort((a, b) => {
+                if (!a.dueDate || !b.dueDate) return 0;
+                return a.dueDate.seconds - b.dueDate.seconds;
+            });
 
             if (sortedHomeworks.length === 0) {
                  assignedList.innerHTML = '<p class="text-gray-600">ไม่มีการบ้านในหมวดหมู่นี้</p>';
@@ -350,6 +353,7 @@
             let submittedCount = 0;
 
             sortedHomeworks.forEach(hw => {
+                if (!hw.dueDate) return; // Skip rendering if dueDate is missing
                 const dueDate = new Date(hw.dueDate.seconds * 1000);
                 const card = document.createElement('div');
                 card.className = 'bg-white p-4 rounded-lg shadow-sm';
@@ -478,6 +482,7 @@
             e.preventDefault();
             const editingId = editingIdInput.value;
             const formData = new FormData(homeworkForm);
+            
             const data = {
                 subject: formData.get('subject'),
                 details: formData.get('details'),
@@ -491,11 +496,14 @@
             try {
                 if (editingId) {
                     const docRef = doc(db, `artifacts/${appId}/public/data/homeworks`, editingId);
-                    await updateDoc(docRef, data);
+                    await updateDoc(docRef, { ...data, updatedAt: serverTimestamp() });
                 } else {
-                    data.createdAt = new Date();
-                    data.status = 'assigned';
-                    await addDoc(collection(db, `artifacts/${appId}/public/data/homeworks`), data);
+                    const newData = {
+                        ...data,
+                        createdAt: serverTimestamp(),
+                        status: 'assigned'
+                    };
+                    await addDoc(collection(db, `artifacts/${appId}/public/data/homeworks`), newData);
                 }
                 showStatus('บันทึกสำเร็จ!', '✅');
                 homeworkForm.reset();
@@ -557,7 +565,7 @@
                 itemToDeleteId = id;
                 deleteModal.classList.add('is-visible');
             } else if (action === 'done') {
-                updateDoc(doc(db, `artifacts/${appId}/public/data/homeworks`, id), { status: 'submitted', submittedAt: new Date() });
+                updateDoc(doc(db, `artifacts/${appId}/public/data/homeworks`, id), { status: 'submitted', submittedAt: serverTimestamp() });
             } else if (action === 'revert') {
                 updateDoc(doc(db, `artifacts/${appId}/public/data/homeworks`, id), { status: 'assigned', submittedAt: null });
             } else if (action === 'print') {
@@ -720,4 +728,3 @@
     </script>
 </body>
 </html>
-�
