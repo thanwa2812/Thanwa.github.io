@@ -36,7 +36,14 @@
         50% {box-shadow: 0 0 20px gold;}
         75% {box-shadow: 0 0 20px darkviolet;}
         100% {box-shadow: 0 0 20px red;}
-
+      }
+.blink-bg
+      {animation: blinking 1s infinite alternate;
+       padding: 3px 6px;}
+      @keyframes blinking
+      { 0% {background: yellow;}
+        100% {background: orange;}
+      }
     </style>
   
   </head>
